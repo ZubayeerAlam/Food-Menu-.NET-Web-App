@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Menu.Data;
 using Menu.Models;
-using System.Diagnostics.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Menu.Controllers
@@ -15,23 +14,42 @@ namespace Menu.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search, string? sort)
         {
-            return View(await _context.Dishes.ToListAsync());
+            var dishes = _context.Dishes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                dishes = dishes.Where(d => d.name.Contains(search));
+            }
+
+            dishes = sort switch
+            {
+                "price_asc" => dishes.OrderBy(d => d.Price),
+                "price_desc" => dishes.OrderByDescending(d => d.Price),
+                _ => dishes
+            };
+
+            return View(await dishes.ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
         {
-           
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             var dish = await _context.Dishes.Include(d => d.DishIngredients)
                 .ThenInclude(di => di.Ingredient)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (dish == null)
             {
                 return NotFound();
             }
+
             return View(dish);
         }
-
     }
 }
