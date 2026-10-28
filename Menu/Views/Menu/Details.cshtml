@@ -1,0 +1,47 @@
+﻿@model Menu.Models.Dish
+
+@{
+    ViewData["Title"] = "Dish Details";
+}
+
+<div class="container">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <div class="row">
+        <div class="col-md-5">
+            <img src="@Model.Imageurl" alt="@Model.name" class="img-fluid rounded" style="width:100%; object-fit:cover;" />
+        </div>
+
+        <div class="col-md-7">
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.name</dd>
+
+                <dt class="col-sm-3">Price</dt>
+                <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
+            </dl>
+
+            <h4 class="mt-4">Ingredients</h4>
+
+            @if (Model.DishIngredients != null && Model.DishIngredients.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var di in Model.DishIngredients)
+                    {
+                        <li class="list-group-item">
+                            @di.Ingredient?.Name
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-muted">No ingredients listed.</p>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Back to Menu</a>
+    </div>
+</div>
